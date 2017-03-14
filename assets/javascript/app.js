@@ -13,22 +13,51 @@ firebase.initializeApp(config);
 // Create a variable to reference the database.
 var database = firebase.database();
 
+// Variables.
 // ------------------------------------
 // Initial Train Schedule Values.
-// Also store global variable for current time.
+var name = "";
+var destination = "";
+var frequency = 0;
+var nextTrain = "";
+var minutesAway = 0;
+
+// Current time in milleseconds.
+var timeInMS = Date.now();
+console.log("This is date now: " + timeInMS);
 
 // Capture Submit Button Click.
-// This is to add new trains.
+// TODO: Don't allow for empty submits!
+$("#submit-train").on("click", function() {
+  // Don't refresh page!
+  event.preventDefault();
 
-// Don't refresh page on submit.
+  // Get train data from DOM.
+  name = $("#train-name").val().trim();
+  firstTrain = $("#first-train").val().trim();
+  destination = $("#destination").val().trim();
+  frequency = $("#frequency").val().trim();
+
+  // Push data to database.
+  database.ref().push({
+    name: name,
+    firstTrain: firstTrain,
+    destination: destination,
+    frequency: frequency
+  });
+
+  // Clear out input text as a courtesy to your user.
+  $("#train-name").val("");
+  $("#first-train").val("");
+  $("#destination").val("");
+  $("#frequency").val("");
+});
+
 
 // Code in logic for storing new train schedule.
 // Will need to call function that creates train times array.
 // Will need to call function that calculates next arrival.
 // Will need to call function that calculates minutes away.
-
-// Don't forget to check in database that items are being stored.
-// Use push instead of set, so multiple trains can get added.
 
 // Retrieve list of trains using child_added
 // Build up table in DOM.
@@ -43,6 +72,10 @@ var database = firebase.database();
 // Somehow comparing the array time to the current time.
 // Once the train time is greater than the current time,
 // That's the one that is set to the next arrival.
+// Will need to get hours and minutes for current time as part of this,
+// Perhaps creating two smaller functions to do this.
+// They need to be numeric values for comparison sake.
+// Will also need to tack on AM or PM depending on time.
 
 // Write function that calculates minutes away.
 // Pass in next arrival time into this function.
