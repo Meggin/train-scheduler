@@ -24,9 +24,9 @@ var nextTrain = "";
 var minutesAway = 0;
 var schedule = [];
 
-// Current time in minutes.
-var timeInMinutes = ((Date.now()) % 1000) % 60;
-console.log("This is date now: " + timeInMS);
+// Placeholder for time at the moment (not working).
+var timeInMinutes = 180;
+console.log("This is date now: " + timeInMinutes);
 
 // Capture Submit Button Click.
 // TODO: Don't allow for empty submits!
@@ -40,7 +40,11 @@ $("#submit-train").on("click", function() {
   destination = $("#destination").val().trim();
   frequency = $("#frequency").val().trim();
 
-  var schedule = createTrainSchedule(firstTrain, frequency);
+  var firstTrainMin = convertFirstTrainToMinutes(firstTrain);
+
+  console.log('First train in minutes for now should be 60 ' + firstTrainMin);
+
+  var schedule = createTrainSchedule(firstTrainMin, frequency);
 
   var nextArrival = determineNextTrain(schedule);
 
@@ -63,15 +67,26 @@ $("#submit-train").on("click", function() {
   $("#frequency").val("");
 });
 
+// The first thing to do is figure out the start time in minutes.
+// Given we have military time-- there's two different equations:
+// If AM, first train time in minutes = (hr * 60) + min;
+// If PM, first train time in minutes = ((hr + 12) * 60) + min;
+function convertFirstTrainToMinutes(firstTrain) {
+  // Will start off with sample result to work through logic.
+  var firstTrainMin = 60;
+  return firstTrainMin;
+}
+
+trainTime = 0;
 // Write function that creates train times array.
 // This function uses the first train time, and frequency.
 // Creates an array of train times over 24 hour period.
-function createTrainSchedule(firstTrain, frequency) {
-
-
-
-  for (var i = 0; )
-  
+function createTrainSchedule(firstTrainMin, frequency) {
+  for (var i = 0; trainTime < 1440; i++) {
+    trainTime = firstTrainMin + (frequency*i);
+    schedule.push(trainTime);
+  }
+  console.log("Schedule array looks like this: " + schedule.toString());
   return schedule;
 };
 
@@ -86,6 +101,9 @@ function createTrainSchedule(firstTrain, frequency) {
 // They need to be numeric values for comparison sake.
 // Will also need to tack on AM or PM depending on time.
 function determineNextTrain(schedule) {
+
+  // Just to get this running, simple placeholder
+  nextArrival = "02:00 AM";
   return nextArrival;
 }
 
@@ -95,6 +113,9 @@ function determineNextTrain(schedule) {
 // Compare current time to next arrival time.
 // The difference of this is the minutes away.
 function determineMinutesAway(nextArrival) {
+
+  // Just to get this running, simple placeholder.
+  minutesAway = 5;
   return minutesAway;
 }
 
@@ -136,11 +157,6 @@ function determineMinutesAway(nextArrival) {
 // Need to create an array of train times starting with the first train time,
 // And then building up list of next train times by adding the frequency to previous train time,
 // All the way up to 1440.
-
-// The first thing to do is figure out the start time in minutes.
-// Given we have military time-- there's two different equations:
-// If AM, first train time in minutes = (hr * 60) + min;
-// If PM, first train time in minutes = ((hr + 12) * 60) + min;
 
 // To work out the next arrival, you find the item in the array
 // Closest to the current time.
