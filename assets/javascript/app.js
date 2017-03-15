@@ -23,6 +23,7 @@ var firstTrain = "";
 var nextTrain = "";
 var minutesAway = 0;
 var schedule = [];
+var trainTime = 0;
 
 // Placeholder for time at the moment (not working).
 var timeInMinutes = 180;
@@ -77,17 +78,19 @@ function convertFirstTrainToMinutes(firstTrain) {
   return firstTrainMin;
 }
 
-trainTime = 0;
 // Write function that creates train times array.
 // This function uses the first train time, and frequency.
 // Creates an array of train times over 24 hour period.
 function createTrainSchedule(firstTrainMin, frequency) {
   for (var i = 0; trainTime < 1440; i++) {
     trainTime = firstTrainMin + (frequency*i);
-    schedule.push(trainTime);
+    if (trainTime > 1440) {
+      return schedule;
+    } else {
+      schedule.push(trainTime);
+    }
   }
   console.log("Schedule array looks like this: " + schedule.toString());
-  return schedule;
 };
 
 // Write function that calculates next arrival.
