@@ -104,6 +104,7 @@ function convertCurrentTimeToMinutes() {
 // Creates an array of train times over 24 hour period.
 function createTrainSchedule(firstTrainTotalMin, frequency) {
   trainTime = 0;
+  schedule = [];
   for (var i = 0; trainTime < 1440; i++) {
     trainTime = firstTrainTotalMin + (frequency*i);
     if (trainTime > 1440) {
@@ -166,7 +167,9 @@ function convertNextTrainToHoursMin(nextArrivalInMin) {
 function determineMinutesAway(nextArrivalInMin, currentTimeTotalMin) {
 
   // Just to get this running, simple placeholder.
-  minutesAway = 5;
+  minutesAway = nextArrivalInMin - currentTimeTotalMin;
+
+  console.log("Real minutes away: " + minutesAway);
   return minutesAway;
 }
 
