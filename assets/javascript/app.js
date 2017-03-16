@@ -40,15 +40,21 @@ $("#submit-train").on("click", function() {
   destination = $("#destination").val().trim();
   frequency = $("#frequency").val().trim();
 
+  convertCurrentTimeToMinutes();
+
   convertFirstTrainToMinutes(firstTrain);
 
   console.log("Schedule looks like this: " + schedule.toString());
 
-  createTrainSchedule(firstTrainTotalMin, frequency);
-
-  convertCurrentTimeToMinutes();
-
-  determineNextTrain(currentTimeTotalMin, schedule);
+  if (frequency < 1440) {
+    createTrainSchedule(firstTrainTotalMin, frequency);
+    determineNextTrain(currentTimeTotalMin, schedule);
+    determineMinutesAway(nextArrivalInMin, currentTimeTotalMin);
+  } else {
+    nextArrivalInMin = firstTrainTotalMin + (frequency%1440);
+    determineNextTrain(currentTimeTotalMin, nextArrivalInMin);
+    minutesAway = parseFloat(firstTrainTotalMin) + parseFloat(frequency);
+  }
 
   console.log("Next arrival time in minutes is: " + nextArrivalInMin);
 
@@ -56,7 +62,11 @@ $("#submit-train").on("click", function() {
 
   console.log("This is the nextArrival string: " + nextArrival);
 
-  determineMinutesAway(nextArrivalInMin, currentTimeTotalMin);
+  // Clear out input text as a courtesy to your user.
+  $("#train-name").val("");
+  $("#first-train").val("");
+  $("#destination").val("");
+  $("#frequency").val("");
 
   // Push data to database.
   database.ref().push({
@@ -66,13 +76,18 @@ $("#submit-train").on("click", function() {
     nextArrival: nextArrival,
     minutesAway: minutesAway
   });
+});
 
-
-  // Clear out input text as a courtesy to your user.
-  $("#train-name").val("");
-  $("#first-train").val("");
-  $("#destination").val("");
-  $("#frequency").val("");
+// Firebase watcher
+database.ref().on("child_added", function(snapshot) {
+  //Append to HTML to reflect event.
+  $("#trains").append("<tr>" +
+                        "<th>" + snapshot.val().name + "</th>" +
+                        "<th>" + snapshot.val().destination + "</th>" +
+                        "<th>" + snapshot.val().frequency + "</th>" +
+                        "<th>" + snapshot.val().nextArrival + "</th>" +
+                        "<th>" + snapshot.val().minutesAway + "</th>" +
+                      "</tr>");
 });
 
 // The first thing to do is figure out the start time in minutes.
