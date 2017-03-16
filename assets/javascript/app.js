@@ -23,11 +23,8 @@ var firstTrain = "";
 var nextTrain = "";
 var minutesAway = 0;
 var schedule = [];
+var firstTrainTotalMin = 0;
 var trainTime = 0;
-
-// Placeholder for time at the moment (not working).
-var timeInMinutes = 180;
-console.log("This is date now: " + timeInMinutes);
 
 // Capture Submit Button Click.
 // TODO: Don't allow for empty submits!
@@ -41,15 +38,11 @@ $("#submit-train").on("click", function() {
   destination = $("#destination").val().trim();
   frequency = $("#frequency").val().trim();
 
-  var firstTrainMin = convertFirstTrainToMinutes(firstTrain);
+  convertFirstTrainToMinutes(firstTrain);
 
-  console.log('First train in minutes for now should be 60 ' + firstTrainMin);
+  nextArrival = determineNextTrain();
 
-  var schedule = createTrainSchedule(firstTrainMin, frequency);
-
-  var nextArrival = determineNextTrain(schedule);
-
-  var minutesAway = determineMinutesAway(nextArrival);
+  minutesAway = determineMinutesAway(nextArrival);
 
   // Push data to database.
   database.ref().push({
@@ -74,23 +67,29 @@ $("#submit-train").on("click", function() {
 // If PM, first train time in minutes = ((hr + 12) * 60) + min;
 function convertFirstTrainToMinutes(firstTrain) {
   // Will start off with sample result to work through logic.
-  var firstTrainMin = 60;
-  return firstTrainMin;
+  firstTrain = moment(firstTrain, "hh:mm");
+  firstTrainHours = firstTrain.hours();
+  console.log("This is first train hours: " + firstTrainHours);
+  firstTrainMin = firstTrain.minutes();
+  console.log("This is first train minutes: " + firstTrainMin);
+  firstTrainTotalMin = firstTrainMin + firstTrainHours*60;
+  console.log("This is first train total minutes: " + firstTrainTotalMin);
+  createTrainSchedule(firstTrainTotalMin, frequency);
 }
 
 // Write function that creates train times array.
 // This function uses the first train time, and frequency.
 // Creates an array of train times over 24 hour period.
-function createTrainSchedule(firstTrainMin, frequency) {
+function createTrainSchedule(firstTrainTotalMin, frequency) {
   for (var i = 0; trainTime < 1440; i++) {
-    trainTime = firstTrainMin + (frequency*i);
+    trainTime = firstTrainTotalMin + (frequency*i);
     if (trainTime > 1440) {
+      console.log("Schedule array looks like this: " + schedule.toString());
       return schedule;
     } else {
       schedule.push(trainTime);
     }
   }
-  console.log("Schedule array looks like this: " + schedule.toString());
 };
 
 // Write function that calculates next arrival.
@@ -103,7 +102,7 @@ function createTrainSchedule(firstTrainMin, frequency) {
 // Perhaps creating two smaller functions to do this.
 // They need to be numeric values for comparison sake.
 // Will also need to tack on AM or PM depending on time.
-function determineNextTrain(schedule) {
+function determineNextTrain() {
 
   // Just to get this running, simple placeholder
   nextArrival = "02:00 AM";
@@ -115,7 +114,7 @@ function determineNextTrain(schedule) {
 // Pass in next arrival time into this function.
 // Compare current time to next arrival time.
 // The difference of this is the minutes away.
-function determineMinutesAway(nextArrival) {
+function determineMinutesAway() {
 
   // Just to get this running, simple placeholder.
   minutesAway = 5;
