@@ -20,11 +20,12 @@ var name = "";
 var destination = "";
 var frequency = 0;
 var firstTrain = "";
-var nextTrain = "";
 var minutesAway = 0;
 var schedule = [];
 var firstTrainTotalMin = 0;
 var trainTime = 0;
+var currentTimeTotalMin = 0;
+var nextArrival = 0;
 
 // Capture Submit Button Click.
 // TODO: Don't allow for empty submits!
@@ -40,9 +41,13 @@ $("#submit-train").on("click", function() {
 
   convertFirstTrainToMinutes(firstTrain);
 
-  nextArrival = determineNextTrain();
+  console.log("Schedule looks like this: " + schedule.toString());
 
-  minutesAway = determineMinutesAway(nextArrival);
+  convertCurrentTimeToMinutes();
+
+  determineNextTrain(currentTimeTotalMin, schedule);
+
+  determineMinutesAway(nextArrival, currentTimeTotalMin);
 
   // Push data to database.
   database.ref().push({
@@ -77,6 +82,15 @@ function convertFirstTrainToMinutes(firstTrain) {
   createTrainSchedule(firstTrainTotalMin, frequency);
 }
 
+function convertCurrentTimeToMinutes() {
+  var currentHours = moment().hours();
+  console.log("Current time hours: " + currentHours);
+  var currentMinutes = moment().minutes();
+  console.log("Current time minutes: " + currentMinutes);
+  currentTimeTotalMin = currentMinutes + currentHours*60;
+  console.log("This is the current time total minutes: " + currentTimeTotalMin);
+}
+
 // Write function that creates train times array.
 // This function uses the first train time, and frequency.
 // Creates an array of train times over 24 hour period.
@@ -102,11 +116,16 @@ function createTrainSchedule(firstTrainTotalMin, frequency) {
 // Perhaps creating two smaller functions to do this.
 // They need to be numeric values for comparison sake.
 // Will also need to tack on AM or PM depending on time.
-function determineNextTrain() {
+function determineNextTrain(currentTimeTotalMin, schedule) {
 
-  // Just to get this running, simple placeholder
-  nextArrival = "02:00 AM";
-  return nextArrival;
+  //Scheduled train time after current time is next arrival time.
+  for (var i = 0; i < schedule.length; i++) {
+    if (schedule[i] > currentTimeTotalMin) {
+      nextArrival = schedule[i];
+      console.log("Next arrival time in minutes is: " + nextArrival);
+      return nextArrival;
+    }
+  }
 }
 
 
@@ -114,7 +133,7 @@ function determineNextTrain() {
 // Pass in next arrival time into this function.
 // Compare current time to next arrival time.
 // The difference of this is the minutes away.
-function determineMinutesAway() {
+function determineMinutesAway(nextArrival, currentTimeTotalMin) {
 
   // Just to get this running, simple placeholder.
   minutesAway = 5;
